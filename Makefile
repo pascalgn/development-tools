@@ -1,10 +1,21 @@
+SOURCES=$(shell ls *.sh *.py)
+
+PREFIX=$(HOME)/bin
+
 all:
 
-install:
-	mkdir -p ~/bin
-	cp mvn-download-artifact.sh ~/bin/mvn-download-artifact
-	cp mvn-parse-pom.py ~/bin/mvn-parse-pom
-	cp mvn-upload-artifact.sh ~/bin/mvn-upload-artifact
-	cp mvn-upload-repository.py ~/bin/mvn-upload-repository
-	dos2unix ~/bin/mvn-*
+develop: $(PREFIX) $(addprefix .link/, $(SOURCES))
 
+.link/%: %
+	ln -sf $(realpath $<) $(PREFIX)/$(basename $<)
+
+install: $(PREFIX) $(addprefix .copy/, $(SOURCES))
+
+.copy/%: %
+	test -L "$(PREFIX)/$(basename $<)" || rm -f "$(PREFIX)/$(basename $<)"
+	cp $(realpath $<) $(PREFIX)/$(basename $<)
+	dos2unix $(PREFIX)/$(basename $<)
+	chmod +x $(PREFIX)/$(basename $<)
+
+$(PREFIX):
+	test -d $@ || mkdir -p $@
