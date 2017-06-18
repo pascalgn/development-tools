@@ -10,6 +10,8 @@ def upload(url, repository, filter, dry=False):
         url += '/'
     root = os.path.abspath(os.path.expanduser(repository))
     filtered = root + os.sep + filter
+    if not os.path.isdir(filtered):
+        raise Exception('not a directory: %s' % filtered)
     for (dirpath, dirnames, filenames) in os.walk(filtered):
         for filename in filenames:
             if filename == '_remote.repositories' or filename.endswith('.lastUpdated'):

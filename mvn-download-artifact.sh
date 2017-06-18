@@ -4,16 +4,29 @@ OPTIND=1
 
 DEFAULT_URL="https://oss.sonatype.org/content/repositories"
 
+USAGE="usage: $0 [-u <url>] [-r <repository>] <gav>"
+
 url="$DEFAULT_URL"
 repository="$HOME/.m2/repository"
 
-while getopts ":u:r:" opt; do
+while getopts ":u:r:h" opt; do
   case "$opt" in
     u)
         url="$OPTARG"
         ;;
     r)
         repository="$OPTARG"
+        ;;
+    h)
+        echo "$USAGE"
+        echo
+        echo "  gav       the artifact to download in the format groupId:artifactId:version"
+        echo
+        echo "  -r <repository>"
+        echo "            the location of the local repository (default: ~/.m2/repository)"
+        echo "  -u <url>  the URL of the remote repository to download the artifact from"
+        echo "            (default: $DEFAULT_URL)"
+        exit 0
         ;;
     \?)
         echo "Invalid option: -$OPTARG" >&2
@@ -31,7 +44,7 @@ shift $((OPTIND-1))
 id=$1
 
 if [[ -z "$id" ]]; then
-  echo "usage: $0 groupId:artifactId:version"
+  echo "$USAGE"
   exit 1
 fi
 
@@ -40,9 +53,25 @@ if [ ! -d "$repository" ]; then
   exit 2
 fi
 
-groupId=`echo "$id" | cut -d : -f 1`
-artifactId=`echo "$id" | cut -d : -f 2`
-version=`echo "$id" | cut -d : -f 3`
+gavCount=`echo "$id" | tr -d -c ':' | wc -m`
+if [[ $gavCount -eq 2 ]]; then
+    groupId=`echo "$id" | cut -d : -f 1`
+    artifactId=`echo "$id" | cut -d : -f 2`
+    version=`echo "$id" | cut -d : -f 3`
+elif [[ $gavCount -eq 3 ]]; then
+    groupId=`echo "$id" | cut -d : -f 1`
+    artifactId=`echo "$id" | cut -d : -f 2`
+    version=`echo "$id" | cut -d : -f 4`
+else
+    echo "Invalid GAV: $id"
+    exit 3
+fi
+
+echo "GroupId: $groupId"
+echo "ArtifactId: $artifactId"
+echo "Version: $version"
+
+exit 3
 
 snapshot=0
 baseVersion="$version"
@@ -87,7 +116,14 @@ if [[ $snapshot -eq 1 ]]; then
   metadata=`cat "$metadataFile"`
 
   ts=`echo $metadata | grep -oP '<timestamp>\K[^<]+'`
+  if [ $? -ne 0 ]; then
+    exit 105
+  fi
+
   build=`echo $metadata | grep -oP '<buildNumber>\K[^<]+'`
+  if [ $? -ne 0 ]; then
+    exit 105
+  fi
 
   echo "Latest snapshot version: $baseVersion-$ts-$build"
   latest="$artifactId-$baseVersion-$ts-$build"
@@ -104,9 +140,11 @@ fi
   curl -L -O "$fileUrl"
 done)
 
-(cd $targetDir && for fileName in `echo "$artifactId-$baseVersion-*"`; do
-  snapshotName=`echo $fileName | sed "s/$ts-$build/SNAPSHOT/g"`
-  cp "$fileName" "$snapshotName"
-done)
+if [[ $snapshot -eq 1 ]]; then
+  (cd $targetDir && for fileName in `echo "$artifactId-$baseVersion-*"`; do
+    snapshotName=`echo $fileName | sed "s/$ts-$build/SNAPSHOT/g"`
+    cp "$fileName" "$snapshotName"
+  done)
+fi
 
 echo "Downloaded $latest to $targetDir"
