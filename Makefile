@@ -7,6 +7,7 @@ all:
 develop: $(PREFIX) $(addprefix .link/, $(SOURCES))
 
 .link/%: %
+	chmod +x $<
 	ln -sf $(realpath $<) $(PREFIX)/$(basename $<)
 
 install: $(PREFIX) $(addprefix .copy/, $(SOURCES))

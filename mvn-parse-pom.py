@@ -44,7 +44,7 @@ def parse(pom_file, format):
         raise Exception('unknown format: %s' % format)
 
 def main():
-    parser = argparse.ArgumentParser(prog='parse-pom')
+    parser = argparse.ArgumentParser(prog='mvn-parse-pom')
     parser.add_argument('pom', metavar='<pom>', nargs='+', help='POM file')
     parser.add_argument('-F', '--format', metavar='<format>', default='gav',
             help='Output format: gav, artifact or path')
@@ -55,6 +55,7 @@ def main():
             parse(pom_file, args.format)
         except Exception as e:
             print('error parsing %s: %s' % (pom_file, e), file=sys.stderr)
+            exit_code = 1
     sys.exit(exit_code)
 
 if __name__ == '__main__':
