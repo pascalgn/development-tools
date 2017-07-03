@@ -2,7 +2,11 @@
 
 import re
 import sys
+import signal
 import argparse
+
+# prevent broken pipe errors:
+signal.signal(signal.SIGPIPE, signal.SIG_DFL) 
 
 LINE_EXCEPTION = re.compile('^([a-zA-Z0-9_.]+Exception:?)(.*)$')
 LINE_STACK_ELEMENT = re.compile('^(        at )([a-z0-9_.]+)([A-Z][a-zA-Z0-9_.]*)(.*)$')

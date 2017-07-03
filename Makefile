@@ -13,7 +13,7 @@ develop: $(PREFIX) $(addprefix .link/, $(SOURCES))
 install: $(PREFIX) $(addprefix .copy/, $(SOURCES))
 
 .copy/%: %
-	test -L "$(PREFIX)/$(basename $<)" || rm -f "$(PREFIX)/$(basename $<)"
+	-test -L "$(PREFIX)/$(basename $<)" && rm -f "$(PREFIX)/$(basename $<)"
 	cp $(realpath $<) $(PREFIX)/$(basename $<)
 	dos2unix $(PREFIX)/$(basename $<)
 	chmod +x $(PREFIX)/$(basename $<)
