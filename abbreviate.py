@@ -8,7 +8,7 @@ import argparse
 import subprocess
 
 # prevent broken pipe errors:
-signal.signal(signal.SIGPIPE, signal.SIG_DFL) 
+signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
 DEFAULT_WIDTH = 80
 

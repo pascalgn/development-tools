@@ -14,7 +14,9 @@ def upload(url, repository, filter, dry=False):
         raise Exception('not a directory: %s' % filtered)
     for (dirpath, dirnames, filenames) in os.walk(filtered):
         for filename in filenames:
-            if filename == '_remote.repositories' or filename.endswith('.lastUpdated'):
+            if (filename == '_remote.repositories' or filename.endswith('.lastUpdated')
+                    or filename.startswith('maven-metadata-')
+                    or filename == 'resolver-status.properties'):
                 continue
             full_path = dirpath + os.sep + filename
             if not full_path.startswith(root):
