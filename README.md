@@ -15,6 +15,12 @@ Abbreviate long lines:
 
     $ cat access.log | abbreviate
 
+### git-ghpr
+
+Push the current local branch to the matching remote branch and open the GitHub page to create a new pull request:
+
+    $ git ghpr
+
 ### git-merge-theirs
 
 Merge another branch, using strategy `theirs` to use all changes from their branch:
