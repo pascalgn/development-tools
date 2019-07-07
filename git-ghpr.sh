@@ -7,12 +7,12 @@ git push --set-upstream origin "${BRANCH}" || exit 1
 
 URL="https://github.com/${REPO}/pull/new/${BRANCH}"
 
-if which xdg-open >/dev/null; then
+if command -v xdg-open >/dev/null; then
   xdg-open "${URL}"
-elif which gnome-open >/dev/null; then
+elif command -v gnome-open >/dev/null; then
   gnome-open "${URL}"
-elif which open >/dev/null; then
+elif command -v open >/dev/null; then
   open "${URL}"
-elif which python >/dev/null; then
+elif command -v python >/dev/null; then
   python -mwebbrowser "${URL}"
 fi

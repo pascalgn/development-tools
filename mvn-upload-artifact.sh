@@ -18,10 +18,10 @@ if [[ ! -e "$POM" ]]; then
     exit 4
 fi
 
-POM_BASEDIR="`dirname \"$POM\"`"
-POM_BASENAME="`basename \"$POM\"`"
+POM_BASEDIR="$(dirname "$POM")"
+POM_BASENAME="$(basename "$POM")"
 
-FILENAME="`$PARSE_POM --format artifact \"$POM\"`"
+FILENAME="$($PARSE_POM --format artifact "$POM")"
 
 FILE="$POM_BASEDIR/$FILENAME"
 if [[ ! -e "$FILE" ]]; then
@@ -29,7 +29,7 @@ if [[ ! -e "$FILE" ]]; then
     exit 4
 fi
 
-URLPATH="`$PARSE_POM --format path \"$POM\"`"
+URLPATH="$($PARSE_POM --format path "$POM")"
 
 FILEURL="$REPOSITORY/$URLPATH/$FILENAME"
 POMURL="$REPOSITORY/$URLPATH/$POM_BASENAME"
@@ -42,8 +42,8 @@ curl --fail --upload-file "$POM" "$POMURL" || exit 10
 
 # Upload other artifacts:
 shift 2
-for ARG in $@; do
-    ARG_BASENAME="`basename \"$ARG\"`"
+for ARG in "$@"; do
+    ARG_BASENAME="$(basename "$ARG")"
     if [[ "$ARG_BASENAME" == "$POM_BASENAME" || "$ARG_BASENAME" == "$FILENAME" ]]; then
         continue
     fi

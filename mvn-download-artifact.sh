@@ -11,35 +11,35 @@ repository="$HOME/.m2/repository"
 
 while getopts ":u:r:h" opt; do
   case "$opt" in
-    u)
-        url="$OPTARG"
-        ;;
-    r)
-        repository="$OPTARG"
-        ;;
-    h)
-        echo "$USAGE"
-        echo
-        echo "  gav       the artifact to download in the format groupId:artifactId:version"
-        echo
-        echo "  -r <repository>"
-        echo "            the location of the local repository (default: ~/.m2/repository)"
-        echo "  -u <url>  the URL of the remote repository to download the artifact from"
-        echo "            (default: $DEFAULT_URL)"
-        exit 0
-        ;;
-    \?)
-        echo "Invalid option: -$OPTARG" >&2
-        exit 1
-        ;;
-    :)
-        echo "Option -$OPTARG requires an argument." >&2
-        exit 1
-        ;;
-    esac
+  u)
+    url="$OPTARG"
+    ;;
+  r)
+    repository="$OPTARG"
+    ;;
+  h)
+    echo "$USAGE"
+    echo
+    echo "  gav       the artifact to download in the format groupId:artifactId:version"
+    echo
+    echo "  -r <repository>"
+    echo "            the location of the local repository (default: ~/.m2/repository)"
+    echo "  -u <url>  the URL of the remote repository to download the artifact from"
+    echo "            (default: $DEFAULT_URL)"
+    exit 0
+    ;;
+  \?)
+    echo "Invalid option: -$OPTARG" >&2
+    exit 1
+    ;;
+  :)
+    echo "Option -$OPTARG requires an argument." >&2
+    exit 1
+    ;;
+  esac
 done
 
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 
 id=$1
 
@@ -53,18 +53,18 @@ if [ ! -d "$repository" ]; then
   exit 2
 fi
 
-gavCount=`echo "$id" | tr -d -c ':' | wc -m`
+gavCount=$(echo "$id" | tr -d -c ':' | wc -m)
 if [[ $gavCount -eq 2 ]]; then
-    groupId=`echo "$id" | cut -d : -f 1`
-    artifactId=`echo "$id" | cut -d : -f 2`
-    version=`echo "$id" | cut -d : -f 3`
+  groupId=$(echo "$id" | cut -d : -f 1)
+  artifactId=$(echo "$id" | cut -d : -f 2)
+  version=$(echo "$id" | cut -d : -f 3)
 elif [[ $gavCount -eq 3 ]]; then
-    groupId=`echo "$id" | cut -d : -f 1`
-    artifactId=`echo "$id" | cut -d : -f 2`
-    version=`echo "$id" | cut -d : -f 4`
+  groupId=$(echo "$id" | cut -d : -f 1)
+  artifactId=$(echo "$id" | cut -d : -f 2)
+  version=$(echo "$id" | cut -d : -f 4)
 else
-    echo "Invalid GAV: $id"
-    exit 3
+  echo "Invalid GAV: $id"
+  exit 3
 fi
 
 echo "GroupId: $groupId"
@@ -78,7 +78,7 @@ baseVersion="$version"
 
 if echo "$version" | grep -q -- "-SNAPSHOT"; then
   snapshot=1
-  baseVersion=`echo $version | grep -oP '.+(?=-SNAPSHOT)'`
+  baseVersion=$(echo "$version" | grep -oP '.+(?=-SNAPSHOT)')
 fi
 
 if [ "$url" == "$DEFAULT_URL" ]; then
@@ -89,7 +89,7 @@ if [ "$url" == "$DEFAULT_URL" ]; then
   fi
 fi
 
-groupPath=`echo "$groupId" | sed 's/\./\//g'`
+groupPath=$(echo "$groupId" | sed 's/\./\//g')
 path="$groupPath/$artifactId/$version"
 
 echo "Fetching $groupId:$artifactId:$version"
@@ -113,15 +113,13 @@ if [[ $snapshot -eq 1 ]]; then
     curl -o "$metadataFile" -L "$url/$path/maven-metadata.xml" || exit 110
   fi
 
-  metadata=`cat "$metadataFile"`
+  metadata=$(cat "$metadataFile")
 
-  ts=`echo $metadata | grep -oP '<timestamp>\K[^<]+'`
-  if [ $? -ne 0 ]; then
+  if ! ts=$(echo "$metadata" | grep -oP '<timestamp>\K[^<]+'); then
     exit 105
   fi
 
-  build=`echo $metadata | grep -oP '<buildNumber>\K[^<]+'`
-  if [ $? -ne 0 ]; then
+  if ! build=$(echo "$metadata" | grep -oP '<buildNumber>\K[^<]+'); then
     exit 105
   fi
 
@@ -130,19 +128,18 @@ if [[ $snapshot -eq 1 ]]; then
 fi
 
 echo "Fetching $url/$path ..."
-fileUrls=`curl -L "$url/$path" | grep -Eo "$url/$path/${latest}[a-zA-Z0-9.-]+"`
-if [ $? -ne 0 ]; then
+if ! fileUrls=$(curl -L "$url/$path" | grep -Eo "$url/$path/${latest}[a-zA-Z0-9.-]+"); then
   exit 110
 fi
 
-(cd $targetDir && for fileUrl in $fileUrls; do
+(cd "$targetDir" && for fileUrl in $fileUrls; do
   echo "Fetching $fileUrl ..."
   curl -L -O "$fileUrl"
 done)
 
 if [[ $snapshot -eq 1 ]]; then
-  (cd $targetDir && for fileName in `echo "$artifactId-$baseVersion-*"`; do
-    snapshotName=`echo $fileName | sed "s/$ts-$build/SNAPSHOT/g"`
+  (cd "$targetDir" && for fileName in $(echo "$artifactId-$baseVersion-*"); do
+    snapshotName="${fileName//$ts-$build/SNAPSHOT}"
     cp "$fileName" "$snapshotName"
   done)
 fi

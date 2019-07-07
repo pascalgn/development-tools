@@ -4,14 +4,13 @@ FIND="find . ( -name .metadata -or -name .project -or -name .classpath -or -name
 
 echo "Searching files..."
 
-$FIND | grep -E --color=never '.*'
-if [[ $? -ne 0 ]]; then
+if ! $FIND | grep -E --color=never '.'; then
     echo "No setting files found"
     exit 0
 fi
 
 while true; do
-    read -p "Delete these files? (y/n) " yn
+    read -r -p "Delete these files? (y/n) " yn
     case $yn in
         [Yy]) break;;
         [Nn]) exit;;

@@ -3,6 +3,7 @@ SOURCES=$(shell ls *.sh *.py)
 PREFIX=$(HOME)/bin
 
 all:
+	shellcheck *.sh
 
 develop: .checkprefix $(PREFIX) $(addprefix .link/, $(SOURCES))
 
