@@ -21,6 +21,18 @@ Push the current local branch to the matching remote branch and open the GitHub 
 
     $ git ghpr
 
+### git-import-repository
+
+Copy another repository into the current repository, including git history:
+
+    $ ls -a
+    .git    README.md
+    $ ls -a ../other-repo
+    .git    test1.txt    test2.txt
+    $ git-import-repository ../other-repo
+    $ ls -a ./other-repo
+    test1.txt    test2.txt
+
 ### git-merge-theirs
 
 Merge another branch, using strategy `theirs` to use all changes from their branch:
