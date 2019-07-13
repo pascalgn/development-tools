@@ -65,6 +65,13 @@ Filter Java stack traces by only showing lines from the `com.example` package:
 
     $ cat exception.log | java-filter-stacktrace com.example
 
+### kubectl-generate-context-aliases
+
+Generate `kubectl` alias commands based on the existing contexts:
+
+    $ eval "$(kubectl-generate-context-aliases)"
+    $ kubectl-docker-for-desktop get all
+
 ### mvn-download-artifact
 
 Download a Maven artifact to your local repository:
