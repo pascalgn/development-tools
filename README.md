@@ -89,8 +89,17 @@ Show a condensed version of the Maven log output:
 
 Parse Maven POM files:
 
-    $ mvn-parse-pom.py ~/.m2/repository/commons-io/commons-io/2.5/commons-io-2.5.pom
+    $ mvn-parse-pom ~/.m2/repository/commons-io/commons-io/2.5/commons-io-2.5.pom
     commons-io:commons-io:2.5
+
+### mvn-parse-test-run
+
+Parse Maven output and report test duration:
+
+    $ cat mvn.log | mvn-parse-test-run
+    Count,Failures,Errors,Skipped,Duration,Test
+    2,0,0,0,0.987,com.example.ServiceTest
+    5,0,0,0,0.654,com.example.DaoTest
 
 ### mvn-upload-artifact
 
