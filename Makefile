@@ -1,4 +1,4 @@
-SOURCES=$(shell ls *.sh *.py)
+SOURCES=$(shell ls *.sh *.py *.js)
 
 PREFIX=$(HOME)/bin
 
