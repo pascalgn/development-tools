@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 REPO="$(git remote get-url origin | sed -nE 's;(git@|https://)github.com[:/]([^.]+)(\.git)?$;\2;gp')"
@@ -15,4 +15,6 @@ elif command -v open >/dev/null; then
   open "${URL}"
 elif command -v python >/dev/null; then
   python -mwebbrowser "${URL}"
+else
+  echo "${URL}"
 fi
